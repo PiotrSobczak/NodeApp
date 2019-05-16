@@ -11,28 +11,6 @@ import org.apache.poi.xssf.usermodel.{XSSFWorkbook, XSSFSheet}
 import java.io.FileOutputStream
 import scala.collection.JavaConversions._
 
-class Node(val _name: String) {
-  var name: String = _name
-  var childNodes: List[Node] = List()
-  
-  def addSubnode(_node: Node) {
-    childNodes = _node :: childNodes
-  }
-  
-  def isChild(_node: Node) : Boolean = {
-    return (name.substring(0, name.length()-1) == _node.name)
-  }
-  
-  override def toString() : String = {
-    var message = "Node(name=" + name + ", childNodes=["
-    for (childNode <- childNodes) {
-      message = message + childNode.toString
-    }
-    message = message +  "])"
-    return message;
-  }
-}
-
 object NodeApp {  
   def printSheet(sheet: XSSFSheet) {    
     val rowIterator = sheet.iterator()
@@ -63,7 +41,7 @@ object NodeApp {
     }    
   }
   
-  def addNodes(lowerNodes: List[Node], upperNodes: List[Node]) : List[Node] = {
+  def matchNodes(lowerNodes: List[Node], upperNodes: List[Node]) : List[Node] = {
     var upperNodesWithLower : List[Node] = List()
     for(upperNode <- upperNodes) {
       for(lowerNode <- lowerNodes) {
@@ -76,7 +54,7 @@ object NodeApp {
     return upperNodesWithLower
   }
   
-  def groupNodes(sheet: XSSFSheet) {
+  def parseSheet(sheet: XSSFSheet) : List[(Int, String)] = {
     var nodes : List[(Int, String)] = List()
     
     val rowIterator = sheet.iterator()
@@ -94,20 +72,22 @@ object NodeApp {
         }
         rowId += 1  
     }
-    println("All nodes: " + nodes)
+    return nodes
+  }
+  
+  def groupNodes(nodes : List[(Int, String)]) : List[Node] = {    
     val firstLevelNodes = nodes.filter(x => x._1 == 1).map(x => new Node(x._2))
-    println("firstLevelNodes: " + firstLevelNodes)
     val secondLevelNodes = nodes.filter(x => x._1 == 2).map(x => new Node(x._2))
-    println("secondLevelNodes: " + secondLevelNodes)
     val thirdLevelNodes = nodes.filter(x => x._1 == 3).map(x => new Node(x._2))
-    println("thirdLevelNodes: " + thirdLevelNodes)
-    
-    val secondLevelNodesAdded = addNodes(thirdLevelNodes, secondLevelNodes)
-    val firstLevelNodesAdded = addNodes(secondLevelNodesAdded, firstLevelNodes)
-    for (firstLevelNode <- firstLevelNodesAdded) {
-      println(firstLevelNode)
-    }
-    
+
+    val matchedNodes = matchNodes(matchNodes(thirdLevelNodes, secondLevelNodes), firstLevelNodes)  
+    return matchedNodes
+  }
+  
+  def nodesToJson(nodes: List[Node]) : String = {
+    val nodesJsons = nodes.map(x => x.toJson())
+    val nodesJson = "{[" + nodesJsons.mkString(", ") + "]}"
+    return nodesJson
   }
   
   /** Our main function where the action happens */
@@ -128,7 +108,10 @@ object NodeApp {
 
     val mySheet = workbook.getSheetAt(0)
     printSheet(mySheet)
-    groupNodes(mySheet)
+    val nodeTuples = parseSheet(mySheet)
+    val nodes = groupNodes(nodeTuples)
+    
+    println(nodesToJson(nodes))
 
   }  
 }
