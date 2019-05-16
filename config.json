@@ -1,0 +1,4 @@
+{
+  "jar_path": "/path/to/assembly/jar",
+  "sheet_path": "/path/to/xlsx/sheet"
+}
