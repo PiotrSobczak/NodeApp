@@ -15,10 +15,10 @@ object NodeApp {
   }
   
   /** Creating list of node objects from tuples */
-  def createNodes(nodes : List[(Int, String)]) : List[Node] = {    
-    val firstLevelNodes = nodes.filter(x => x._1 == 1).map(x => new Node(x._2))
-    val secondLevelNodes = nodes.filter(x => x._1 == 2).map(x => new Node(x._2))
-    val thirdLevelNodes = nodes.filter(x => x._1 == 3).map(x => new Node(x._2))
+  def createNodes(nodes : List[(Int, Int, String)]) : List[Node] = {    
+    val firstLevelNodes = nodes.filter(x => x._1 == 1).map(x => new Node(x._2, x._3))
+    val secondLevelNodes = nodes.filter(x => x._1 == 2).map(x => new Node(x._2, x._3))
+    val thirdLevelNodes = nodes.filter(x => x._1 == 3).map(x => new Node(x._2, x._3))
 
     val matchedNodes = matchNodes(matchNodes(thirdLevelNodes, secondLevelNodes), firstLevelNodes)  
     return matchedNodes
@@ -50,6 +50,5 @@ object NodeApp {
     val nodeTuples = Utilities.parseSheet(sheet)
     val nodes = createNodes(nodeTuples)
     println(serializeNodes(nodes))
-
   }  
 }

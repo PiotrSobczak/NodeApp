@@ -36,8 +36,8 @@ object Utilities {
     println("-------------------------------------------------------------")
   }
   
-  def parseSheet(sheet: XSSFSheet) : List[(Int, String)] = {
-    var nodes : List[(Int, String)] = List()
+  def parseSheet(sheet: XSSFSheet) : List[(Int, Int, String)] = {
+    var nodes : List[(Int, Int, String)] = List()
     
     val rowIterator = sheet.iterator()
     var rowId : Int = 0
@@ -49,7 +49,7 @@ object Utilities {
           val cell = cellIterator.next()
           colId += 1
           if (cell.getCellType == Cell.CELL_TYPE_STRING && rowId != 0) {
-            nodes = nodes:+((colId, cell.getStringCellValue))
+            nodes = nodes:+((colId, rowId, cell.getStringCellValue))
           }          
         }
         rowId += 1  
