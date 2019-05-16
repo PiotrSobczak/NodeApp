@@ -27,7 +27,7 @@ object NodeApp {
   /** Parsing nodes to json */
   def serializeNodes(nodes: List[Node]) : String = {
     val nodesJsons = nodes.map(x => x.toJson())
-    val nodesJson = "{[" + nodesJsons.mkString(", ") + "]}"
+    val nodesJson = "[" + nodesJsons.mkString(", ") + "]"
     return nodesJson
   }
   
@@ -46,7 +46,6 @@ object NodeApp {
   def main(args: Array[String]) {
     val sheetPath = parseArgs(args)
     val sheet =  Utilities.loadSheet(sheetPath)
-    Utilities.printSheet(sheet)
     val nodeTuples = Utilities.parseSheet(sheet)
     val nodes = createNodes(nodeTuples)
     println(serializeNodes(nodes))

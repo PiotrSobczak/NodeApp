@@ -13,7 +13,7 @@ class Node(val _id: Int, val _name: String) {
   }
   
    def toJson() : String = {
-    var message = "{\"id\":" + id + ", \"name\":" + name + ", \"childNodes\": ["
+    var message = "{\"id\":" + id + ", \"name\": \"" + name + "\", \"childNodes\": ["
     for ((childNode, i) <- childNodes.zipWithIndex) {
       message = message + childNode.toJson
       if (i != childNodes.length - 1) {
