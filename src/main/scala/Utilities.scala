@@ -1,15 +1,8 @@
-import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.DataFormatter
-import org.apache.poi.ss.usermodel.DateUtil
-import org.apache.poi.xssf.usermodel.{XSSFWorkbook, XSSFSheet}
-
-import java.io.File
-import scala.io.Source.fromFile 
 import java.io.FileInputStream
 import java.nio.file.{Paths, Files}
-
-import java.io.FileOutputStream
+import java.io.File
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.xssf.usermodel.{XSSFWorkbook, XSSFSheet}
 
 object Utilities {
   def printSheet(sheet: XSSFSheet) {

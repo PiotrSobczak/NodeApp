@@ -1,4 +1,3 @@
-import scala.collection.JavaConversions._
 
 object NodeApp {
   /** Matching child nodes with their parents */
