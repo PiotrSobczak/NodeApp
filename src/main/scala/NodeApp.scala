@@ -11,17 +11,34 @@ import org.apache.poi.xssf.usermodel.{XSSFWorkbook, XSSFSheet}
 import java.io.FileOutputStream
 import scala.collection.JavaConversions._
 
-object NodeApp {
+class Node(val _name: String) {
+  var name: String = _name
+  var childNodes: List[Node] = List()
   
-  def printSheet(sheet: XSSFSheet) {
-    var nodes : List[(Int, Int, String)] = List()
-    
+  def addSubnode(_node: Node) {
+    childNodes = _node :: childNodes
+  }
+  
+  def isChild(_node: Node) : Boolean = {
+    return (name.substring(0, name.length()-1) == _node.name)
+  }
+  
+  override def toString() : String = {
+    var message = "Node(name=" + name + ", childNodes=["
+    for (childNode <- childNodes) {
+      message = message + childNode.toString
+    }
+    message = message +  "])"
+    return message;
+  }
+}
+
+object NodeApp {  
+  def printSheet(sheet: XSSFSheet) {    
     val rowIterator = sheet.iterator()
-    var rowId : Int = 0
     while(rowIterator.hasNext) {
       val row = rowIterator.next()
         val cellIterator = row.cellIterator()
-        var colId : Int = 0
         while(cellIterator.hasNext) {
           val cell = cellIterator.next()
             cell.getCellType match {
@@ -29,7 +46,7 @@ object NodeApp {
                 print(cell.getStringCellValue + "\t")
               }
               case Cell.CELL_TYPE_NUMERIC => {
-                print(cell.getNumericCellValue + "\t")
+                print(cell.getNumericCellValue.toInt + "\t")
               }
               case Cell.CELL_TYPE_BOOLEAN => {
                 print(cell.getBooleanCellValue + "\t")
@@ -40,23 +57,56 @@ object NodeApp {
               case _ => throw new RuntimeException(" this error occured when reading ")
               //        case Cell.CELL_TYPE_FORMULA => {print(cell.getF + "\t")}
               
-            }
-          colId += 1
-          if (cell.getCellType == Cell.CELL_TYPE_STRING) {
-            nodes = nodes:+((rowId, colId, cell.getStringCellValue))
-          }          
+            }         
         }
         println("")
+    }    
+  }
+  
+  def addNodes(lowerNodes: List[Node], upperNodes: List[Node]) : List[Node] = {
+    var upperNodesWithLower : List[Node] = List()
+    for(upperNode <- upperNodes) {
+      for(lowerNode <- lowerNodes) {
+        if (lowerNode.isChild(upperNode)) {
+          upperNode.addSubnode(lowerNode)
+        }
+      }
+      upperNodesWithLower = upperNode ::upperNodesWithLower
+    }
+    return upperNodesWithLower
+  }
+  
+  def groupNodes(sheet: XSSFSheet) {
+    var nodes : List[(Int, String)] = List()
+    
+    val rowIterator = sheet.iterator()
+    var rowId : Int = 0
+    while(rowIterator.hasNext) {
+      val row = rowIterator.next()
+        val cellIterator = row.cellIterator()
+        var colId : Int = 0
+        while(cellIterator.hasNext) {
+          val cell = cellIterator.next()
+          colId += 1
+          if (cell.getCellType == Cell.CELL_TYPE_STRING && rowId != 0) {
+            nodes = nodes:+((colId, cell.getStringCellValue))
+          }          
+        }
         rowId += 1  
     }
-    val nodesFiltered = nodes.filter(x => !x._3.contains("Poziom"))
-    println("All nodes: " + nodesFiltered)
-    val firstLevelNodes = nodesFiltered.filter(x => x._2 == 1).map(x => x._3)
+    println("All nodes: " + nodes)
+    val firstLevelNodes = nodes.filter(x => x._1 == 1).map(x => new Node(x._2))
     println("firstLevelNodes: " + firstLevelNodes)
-    val secondLevelNodes = nodesFiltered.filter(x => x._2 == 2).map(x => x._3)
+    val secondLevelNodes = nodes.filter(x => x._1 == 2).map(x => new Node(x._2))
     println("secondLevelNodes: " + secondLevelNodes)
-    val thirdLevelNodes = nodesFiltered.filter(x => x._2 == 3).map(x => x._3)
+    val thirdLevelNodes = nodes.filter(x => x._1 == 3).map(x => new Node(x._2))
     println("thirdLevelNodes: " + thirdLevelNodes)
+    
+    val secondLevelNodesAdded = addNodes(thirdLevelNodes, secondLevelNodes)
+    val firstLevelNodesAdded = addNodes(secondLevelNodesAdded, firstLevelNodes)
+    for (firstLevelNode <- firstLevelNodesAdded) {
+      println(firstLevelNode)
+    }
     
   }
   
@@ -75,11 +125,10 @@ object NodeApp {
     val myFile = new File(csvPath)
     val fis = new FileInputStream(myFile)
     val workbook = new XSSFWorkbook(fis)
-    println(workbook)
+
     val mySheet = workbook.getSheetAt(0)
     printSheet(mySheet)
-    
-    val rowIterator = mySheet.iterator()
+    groupNodes(mySheet)
 
   }  
 }
