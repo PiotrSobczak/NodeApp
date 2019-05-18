@@ -5,14 +5,19 @@
 
 # How to run
 
+### Install flask server requirements
+```
+pip3 install -r requirements.txt
+```
+
 ### Build application jar
 ```
 sbt assembly
 ```
 
-### Install requirements
+### Run unit tests
 ```
-pip3 install -r requirements.txt
+sbt test
 ```
 
 ### Set paths to jar and excel sheet in config.py 
@@ -27,5 +32,6 @@ pip3 install -r requirements.txt
 ```
 python3 server.py -c config.py
 ```
+go to http://127.0.0.1:5000/
 
-### Go to http://127.0.0.1:5000/ 
+ 
