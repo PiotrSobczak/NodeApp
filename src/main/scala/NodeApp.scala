@@ -1,27 +1,17 @@
 
 object NodeApp {
   /** Matching child nodes with their parents */
-  def matchNodes(lowerNodes: List[Node], upperNodes: List[Node]) : List[Node] = {
-    var upperNodesWithLower : List[Node] = List()
-    for(upperNode <- upperNodes) {
-      for(lowerNode <- lowerNodes) {
-        if (lowerNode.isChild(upperNode)) {
-          upperNode.addChild(lowerNode)
+  def matchNodes(childNodes: List[Node], parentNodes: List[Node]) : List[Node] = {
+    var parentNodesMatched : List[Node] = List()
+    for(parentNode <- parentNodes) {
+      for(childNode <- childNodes) {
+        if (childNode.isChild(parentNode)) {
+          parentNode.addChild(childNode)
         }
       }
-      upperNodesWithLower = upperNode ::upperNodesWithLower
+      parentNodesMatched = parentNode ::parentNodesMatched
     }
-    return upperNodesWithLower
-  }
-  
-  /** Creating list of node objects from tuples */
-  def createNodes(nodes : List[(Int, Int, String)]) : List[Node] = {    
-    val firstLevelNodes = nodes.filter(x => x._1 == 1).map(x => new Node(x._2, x._3))
-    val secondLevelNodes = nodes.filter(x => x._1 == 2).map(x => new Node(x._2, x._3))
-    val thirdLevelNodes = nodes.filter(x => x._1 == 3).map(x => new Node(x._2, x._3))
-
-    val matchedNodes = matchNodes(matchNodes(thirdLevelNodes, secondLevelNodes), firstLevelNodes)  
-    return matchedNodes
+    return parentNodesMatched
   }
   
   /** Parsing nodes to json */
@@ -47,7 +37,9 @@ object NodeApp {
     val sheetPath = parseArgs(args)
     val sheet =  Utilities.loadSheet(sheetPath)
     val nodeTuples = Utilities.parseSheet(sheet)
-    val nodes = createNodes(nodeTuples)
-    println(serializeNodes(nodes))
+    val nodesByLevel = nodeTuples.groupBy(_._1).mapValues(x => x.map(y => new Node(y._2, y._3)))    
+    val nodesMatched = matchNodes(matchNodes(nodesByLevel(3), nodesByLevel(2)), nodesByLevel(1))  
+    
+    println(serializeNodes(nodesMatched))
   }  
 }
