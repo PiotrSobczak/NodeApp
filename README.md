@@ -1,3 +1,6 @@
+# Project overview
+This project is about grouping abstract Node objects into a tree structure. Node object consists of the following fields: id: Int, name :String, childNodes: List[Node]). Nodes are parsed from xlsx sheet and grouped into a tree structure using scala applicatinon. The structure of the nodes can be viewed using flask server. 
+
 # Dependencies
  - scala 2.12.3
  - sbt 1.2.8
@@ -31,7 +34,7 @@ python3 server.py -c config.py
 
  
 # View node structure
-After running flask server successfully, simply go to go to http://127.0.0.1:5000/. A sample view is presented below.</br></br>
+After running flask server successfully, simply go to http://127.0.0.1:5000/. A sample view is presented below.</br></br>
 <img src="https://github.com/PiotrSobczak/NodeApp/blob/master/images/node_view.png" width="600"></img>
 
 
